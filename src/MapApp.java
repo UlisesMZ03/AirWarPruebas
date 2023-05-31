@@ -15,8 +15,8 @@ public class MapApp extends Application {
 
     private static final double MAP_WIDTH = 1280;
     private static final double MAP_HEIGHT = 720;
-    private static final int NUM_AIRPORTS = 30;
-
+    private static final int NUM_AIRPORTS = 10;
+    private int nameAirport = 0;
     private Image mapImage;
     private PixelReader pixelReader;
 
@@ -45,7 +45,7 @@ public class MapApp extends Application {
                 double hue = pixelColor.getHue();
                 double saturation = pixelColor.getSaturation();
                 double brightness = pixelColor.getBrightness();
-                
+
                 boolean isGreen = hue >= 60 && hue <= 180 && saturation >= 0.3 && brightness >= 0.3;
                 isOnLand = isGreen; // Si el color no está en el rango de tonos de verde, no está en el mar
             } while (!isOnLand);
@@ -53,11 +53,14 @@ public class MapApp extends Application {
             // Obtener las coordenadas de latitud y longitud
             double latitude = convertYToLatitude(y);
             double longitude = convertXToLongitude(x);
-            
-            // Dibujar el aeropuerto
-            drawAirport(gc, x, y);
 
-            System.out.println("Aeropuerto " + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
+            AirPort airport = new AirPort(("Aeropuerto " ), 10); // Puedes reemplazar "Ubicación" por la ubicación real del aeropuerto
+            airport.setLatitude(latitude);
+            airport.setLongitude(longitude);
+            // Dibujar el aeropuerto
+            drawAirport(gc, x, y,("Aeropuerto " + i));
+
+            System.out.println(("Aeropuerto " + nameAirport) + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
             StackPane root = new StackPane(canvas);
             Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
 
@@ -75,22 +78,26 @@ public class MapApp extends Application {
         // ...
     }
 
-    private void drawAirport(GraphicsContext gc, double x, double y) {
+    private void drawAirport(GraphicsContext gc, double x, double y, String location) {
         // Dibujar el aeropuerto
         gc.setFill(Color.RED);
         gc.fillOval(x - 5, y - 5, 10, 10);
+
+        // Agregar la ubicación encima del aeropuerto
+        gc.setFill(Color.BLACK);
+        gc.fillText(location, x-35, y - 10);
     }
 
     private double convertYToLatitude(double y) {
         // Convertir la coordenada Y del clic al valor de latitud correspondiente
-        // ...
-        return 0;
+        double latitudeRange = 90.0; // Rango de latitudes posibles (-90 a 90)
+        return (y / MAP_HEIGHT) * latitudeRange - latitudeRange / 2.0;
     }
 
     private double convertXToLongitude(double x) {
         // Convertir la coordenada X del clic al valor de longitud correspondiente
-        // ...
-        return 0;
+        double longitudeRange = 180.0; // Rango de longitudes posibles (-180 a 180)
+        return (x / MAP_WIDTH) * longitudeRange - longitudeRange / 2.0;
     }
 
     public static void main(String[] args) {
