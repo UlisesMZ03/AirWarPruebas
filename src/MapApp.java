@@ -7,7 +7,10 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import static javafx.application.Application.launch;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
@@ -19,6 +22,7 @@ public class MapApp extends Application {
     private int nameAirport = 0;
     private Image mapImage;
     private PixelReader pixelReader;
+    private Graph graph;
 
     @Override
     public void start(Stage primaryStage) {
@@ -33,6 +37,8 @@ public class MapApp extends Application {
 
         // Generar ubicaciones aleatorias y colocar aeropuertos
         Random random = new Random();
+        graph = new Graph();
+
         for (int i = 0; i < NUM_AIRPORTS; i++) {
             double x, y;
             boolean isOnLand;
@@ -54,20 +60,56 @@ public class MapApp extends Application {
             double latitude = convertYToLatitude(y);
             double longitude = convertXToLongitude(x);
 
-            AirPort airport = new AirPort(("Aeropuerto " ), 10); // Puedes reemplazar "Ubicación" por la ubicación real del aeropuerto
-            airport.setLatitude(latitude);
-            airport.setLongitude(longitude);
+            graph.addNode(latitude, longitude);
+
             // Dibujar el aeropuerto
-            drawAirport(gc, x, y,("Aeropuerto " + i));
+            drawAirport(gc, x, y, ("Aeropuerto " + i));
 
             System.out.println(("Aeropuerto " + nameAirport) + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
-            StackPane root = new StackPane(canvas);
-            Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
-
-            primaryStage.setTitle("Map App");
-            primaryStage.setScene(scene);
-            primaryStage.show();
         }
+
+        // Agregar aristas entre todos los aeropuertos
+        for (int i = 0; i < NUM_AIRPORTS; i++) {
+            for (int j = i + 1; j < NUM_AIRPORTS; j++) {
+                double sourceLatitude = graph.getNode(i).getLatitude();
+                double sourceLongitude = graph.getNode(i).getLongitude();
+                double targetLatitude = graph.getNode(j).getLatitude();
+                double targetLongitude = graph.getNode(j).getLongitude();
+
+                int weight = calculateWeight(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude);
+
+                graph.addEdge(i, j, weight);
+            }
+        }
+
+        // Calcular y trazar las rutas más cortas
+        for (int i = 0; i < NUM_AIRPORTS; i++) {
+            for (int j = i + 1; j < i + 2 && j < NUM_AIRPORTS; j++) {
+                List<Integer> shortestPath = graph.shortestPath(i, j);
+
+                if (!shortestPath.isEmpty()) {
+                    for (int k = 0; k < shortestPath.size() - 1; k++) {
+                        int sourceNode = shortestPath.get(k);
+                        int targetNode = shortestPath.get(k + 1);
+
+                        double sourceX = graph.getNode(sourceNode).getX();
+                        double sourceY = graph.getNode(sourceNode).getY();
+                        double targetX = graph.getNode(targetNode).getX();
+                        double targetY = graph.getNode(targetNode).getY();
+
+                        drawRoute(gc, sourceX, sourceY, targetX, targetY);
+                        System.out.println("Mas corto: "+graph.shortestPath(2, 7));
+                    }
+                }
+            }
+        }
+
+        StackPane root = new StackPane(canvas);
+        Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
+
+        primaryStage.setTitle("Map App");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     private void drawMap(GraphicsContext gc) {
@@ -85,7 +127,13 @@ public class MapApp extends Application {
 
         // Agregar la ubicación encima del aeropuerto
         gc.setFill(Color.BLACK);
-        gc.fillText(location, x-35, y - 10);
+        gc.fillText(location, x - 35, y - 10);
+    }
+
+    private void drawRoute(GraphicsContext gc, double startX, double startY, double endX, double endY) {
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(2);
+        gc.strokeLine(startX, startY, endX, endY);
     }
 
     private double convertYToLatitude(double y) {
@@ -100,7 +148,168 @@ public class MapApp extends Application {
         return (x / MAP_WIDTH) * longitudeRange - longitudeRange / 2.0;
     }
 
+    private int calculateWeight(double lat1, double lon1, double lat2, double lon2) {
+        // Calcular el peso (distancia) entre dos coordenadas geográficas
+        // Puedes implementar aquí la fórmula de cálculo de distancia entre dos puntos geográficos
+        // Por ejemplo, la distancia euclidiana en un plano
+        double dx = lon2 - lon1;
+        double dy = lat2 - lat1;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        return (int) distance;
+    }
+
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private static class Graph {
+
+        private List<Node> nodes;
+        private List<List<Edge>> adjacencyList;
+
+        public Graph() {
+            nodes = new ArrayList<>();
+            adjacencyList = new ArrayList<>();
+        }
+
+        public void addNode(double latitude, double longitude) {
+            Node node = new Node(latitude, longitude);
+            nodes.add(node);
+            adjacencyList.add(new ArrayList<>());
+        }
+
+        public Node getNode(int index) {
+            return nodes.get(index);
+        }
+
+        public void addEdge(int source, int target, int weight) {
+            Edge edge = new Edge(source, target, weight);
+            adjacencyList.get(source).add(edge);
+            adjacencyList.get(target).add(edge); // Agregar también la arista inversa
+        }
+
+        public List<Integer> shortestPath(int source, int target) {
+            List<Integer> shortestPath = new ArrayList<>();
+            int[] distances = new int[nodes.size()];
+            int[] previous = new int[nodes.size()];
+            boolean[] visited = new boolean[nodes.size()];
+
+            for (int i = 0; i < distances.length; i++) {
+                distances[i] = Integer.MAX_VALUE;
+                previous[i] = -1;
+                visited[i] = false;
+            }
+
+            distances[source] = 0;
+
+            for (int i = 0; i < nodes.size() - 1; i++) {
+                int minIndex = -1;
+                int minDistance = Integer.MAX_VALUE;
+
+                for (int j = 0; j < nodes.size(); j++) {
+                    if (!visited[j] && distances[j] < minDistance) {
+                        minIndex = j;
+                        minDistance = distances[j];
+                    }
+                }
+
+                visited[minIndex] = true;
+
+                for (Edge edge : adjacencyList.get(minIndex)) {
+                    int neighbor = edge.getNeighbor(minIndex);
+                    int weight = edge.getWeight();
+
+                    int distanceThroughMin = distances[minIndex] + weight;
+
+                    if (distanceThroughMin < distances[neighbor]) {
+                        distances[neighbor] = distanceThroughMin;
+                        previous[neighbor] = minIndex;
+                    }
+                }
+            }
+
+            int current = target;
+
+            while (current != -1) {
+                shortestPath.add(0, current);
+                current = previous[current];
+            }
+
+            return shortestPath;
+        }
+    }
+
+    private static class Node {
+
+        private double latitude;
+        private double longitude;
+        private double x;
+        private double y;
+
+        public Node(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.x = convertLongitudeToX(longitude);
+            this.y = convertLatitudeToY(latitude);
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        private double convertLatitudeToY(double latitude) {
+            double latitudeRange = 90.0; // Rango de latitudes posibles (-90 a 90)
+            return (latitude + latitudeRange / 2.0) / latitudeRange * MAP_HEIGHT;
+        }
+
+        private double convertLongitudeToX(double longitude) {
+            double longitudeRange = 180.0; // Rango de longitudes posibles (-180 a 180)
+            return (longitude + longitudeRange / 2.0) / longitudeRange * MAP_WIDTH;
+        }
+    }
+
+    private static class Edge {
+
+        private int source;
+        private int target;
+        private int weight;
+
+        public Edge(int source, int target, int weight) {
+            this.source = source;
+            this.target = target;
+            this.weight = weight;
+        }
+
+        public int getSource() {
+            return source;
+        }
+
+        public int getTarget() {
+            return target;
+        }
+
+        public int getNeighbor(int node) {
+            if (node == source) {
+                return target;
+            } else {
+                return source;
+            }
+        }
+
+        public int getWeight() {
+            return weight;
+        }
     }
 }
