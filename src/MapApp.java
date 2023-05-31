@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 import static javafx.application.Application.launch;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
@@ -46,6 +47,7 @@ public class MapApp extends Application {
             boolean isOnLand;
 
             do {
+
                 x = random.nextDouble() * MAP_WIDTH;
                 y = random.nextDouble() * MAP_HEIGHT;
 
@@ -71,32 +73,37 @@ public class MapApp extends Application {
         }
 
         int[] nodeEdgesCount = new int[NUM_AIRPORTS];
-Random randomTarget = new Random();
+        Random randomTarget = new Random();
+        int totalEdges = 0;
+        int MAX_EDGES = 10; // Cambia este valor según tus necesidades
 
-for (int i = 0; i < NUM_AIRPORTS; i++) {
-    while (nodeEdgesCount[i] < 2) {
-        int j = randomTarget.nextInt(NUM_AIRPORTS); // Generar un índice aleatorio para el nodo de destino
+        Arrays.fill(nodeEdgesCount, 0); // Inicializar todos los contadores en cero
 
-        if (i != j && nodeEdgesCount[j] < 2) { // Asegurarse de que no sea el mismo nodo y que el nodo de destino tenga menos de 2 aristas
-            double sourceLatitude = graph.getNode(i).getLatitude();
-            double sourceLongitude = graph.getNode(i).getLongitude();
-            double targetLatitude = graph.getNode(j).getLatitude();
-            double targetLongitude = graph.getNode(j).getLongitude();
-double sourceX = graph.getNode(i).getX();
-                double sourceY = graph.getNode(i).getY();
-                double targetX = graph.getNode(j).getX();
-                double targetY = graph.getNode(j).getY();
+        for (int i = 0; i < NUM_AIRPORTS; i++) {
+            while (nodeEdgesCount[i] < 2 && totalEdges < MAX_EDGES) {
+                int j = randomTarget.nextInt(NUM_AIRPORTS); // Generar un índice aleatorio para el nodo de destino
 
-                drawRoute(gc, sourceX, sourceY, targetX, targetY);
-            int weight = calculateWeight(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude);
+                if (i != j && nodeEdgesCount[j] < 2) { // Asegurarse de que no sea el mismo nodo y que el nodo de destino tenga menos de 2 aristas
+                    double sourceLatitude = graph.getNode(i).getLatitude();
+                    double sourceLongitude = graph.getNode(i).getLongitude();
+                    double targetLatitude = graph.getNode(j).getLatitude();
+                    double targetLongitude = graph.getNode(j).getLongitude();
+                    double sourceX = graph.getNode(i).getX();
+                    double sourceY = graph.getNode(i).getY();
+                    double targetX = graph.getNode(j).getX();
+                    double targetY = graph.getNode(j).getY();
 
-            graph.addEdge(i, j, weight);
+                    drawRoute(gc, sourceX, sourceY, targetX, targetY);
+                    int weight = calculateWeight(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude);
 
-            nodeEdgesCount[i]++;
-            nodeEdgesCount[j]++;
+                    graph.addEdge(i, j, weight);
+
+                    nodeEdgesCount[i]++;
+                    nodeEdgesCount[j]++;
+                    totalEdges++;
+                }
+            }
         }
-    }
-}
 
         // Calcular y trazar las rutas más cortas
 //        Random randomm = new Random();
@@ -149,8 +156,12 @@ double sourceX = graph.getNode(i).getX();
     }
 
     private void drawRoute(GraphicsContext gc, double startX, double startY, double endX, double endY) {
-        gc.setStroke(Color.BLUE);
+        gc.setStroke(Color.RED);
         gc.setLineWidth(2);
+
+        // Agregar efecto de sombra
+        gc.setEffect(new DropShadow(10, Color.BLACK));
+
         gc.strokeLine(startX, startY, endX, endY);
     }
 
