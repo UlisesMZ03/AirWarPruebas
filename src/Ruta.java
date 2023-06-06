@@ -22,7 +22,7 @@ public class Ruta {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         // Radio de la Tierra en kilómetros
-        double r = 6371;
+        double r = 1000;
 
         double distancia = r * c;
         return distancia;
@@ -33,9 +33,9 @@ public class Ruta {
         double peso = distancia;
 
         if (destino instanceof Portaavion) {
-            peso *= 1.5; // Aumenta el peso en un 50% si el destino es un portaaviones
+            peso *= 1.2; // Aumenta el peso en un 50% si el destino es un portaaviones
         } else {
-            peso *= 1.2; // Aumenta el peso en un 20% si el destino es un aeropuerto
+            peso *= 1; // Aumenta el peso en un 20% si el destino es un aeropuerto
         }
 
         peso += peligro; // Añade el valor del peligro a la distancia

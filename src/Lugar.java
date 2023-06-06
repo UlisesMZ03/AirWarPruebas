@@ -22,4 +22,13 @@ public abstract class Lugar {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+    public double getX() {
+        double longitudeRange = 180.0;
+        return (longitude + longitudeRange / 2.0) / longitudeRange * 1280;
+    }
+
+    public double getY() {
+        double latitudeRange = 90.0;
+        return (latitude + latitudeRange / 2.0) / latitudeRange * 720;
+    }
 }

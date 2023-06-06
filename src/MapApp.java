@@ -28,8 +28,8 @@ public class MapApp extends Application {
     private Image mapImage;
     private PixelReader pixelReader;
     private Graph graph;
-    List<AirPort> airports = new ArrayList<>();
-    List<Portaavion> portaAvionesList = new ArrayList<>();
+    List<Lugar> ubicaciones = new ArrayList<>();
+
     private GraphicsContext gc;
     private int nRoutes = 100;
 
@@ -73,7 +73,7 @@ public class MapApp extends Application {
                     drawRoute(gc, sourceX, sourceY, targetX, targetY);
                     int weight = calculateWeight(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude);
 
-                    graph.addEdge(i, j, weight);
+                    graph.addEdge(graph.getNode(i), graph.getNode(j), weight);
 
                     nodeEdgesCount[i]++;
                     nodeEdgesCount[j]++;
@@ -82,9 +82,9 @@ public class MapApp extends Application {
                 }
             }
         }
-        //System.out.println(airports.get(1).getNombre());
+        System.out.println(ubicaciones);
         graph.printAdjacencyMatrix();
-        //System.out.println("Mas corto: " + graph.shortestPath(0, 5));
+        System.out.println("Mas corto: " + graph.shortestPath(ubicaciones.get(0), ubicaciones.get(3)));
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
 
@@ -98,58 +98,55 @@ public class MapApp extends Application {
             double x, y;
             boolean isOnLand;
 
-            
-                x = random.nextDouble() * MAP_WIDTH;
-                y = random.nextDouble() * MAP_HEIGHT;
+            x = random.nextDouble() * MAP_WIDTH;
+            y = random.nextDouble() * MAP_HEIGHT;
 
-                Color pixelColor = pixelReader.getColor((int) x, (int) y);
-                double hue = pixelColor.getHue();
-                double saturation = pixelColor.getSaturation();
-                double brightness = pixelColor.getBrightness();
+            Color pixelColor = pixelReader.getColor((int) x, (int) y);
+            double hue = pixelColor.getHue();
+            double saturation = pixelColor.getSaturation();
+            double brightness = pixelColor.getBrightness();
 
-                boolean isGreen = hue >= 60 && hue <= 180 && saturation >= 0.3 && brightness >= 0.3;
-                isOnLand = isGreen; // Si el color no está en el rango de tonos de verde, no está en el mar
+            boolean isGreen = hue >= 60 && hue <= 180 && saturation >= 0.3 && brightness >= 0.3;
+            isOnLand = isGreen; // Si el color no está en el rango de tonos de verde, no está en el mar
 
-                if (isOnLand) {
-                    // Obtener las coordenadas de latitud y longitud
-                    double latitude = convertYToLatitude(y);
-                    double longitude = convertXToLongitude(x);
+            if (isOnLand) {
+                // Obtener las coordenadas de latitud y longitud
+                double latitude = convertYToLatitude(y);
+                double longitude = convertXToLongitude(x);
 
-                    AirPort airport = new AirPort("Aeropuerto " + i, ((random.nextInt(3)) + 3), latitude, longitude);
-                    airports.add(airport);
-                    System.out.println(airport.getNombre());
+                AirPort airport = new AirPort("Aeropuerto " + i, ((random.nextInt(3)) + 3), latitude, longitude);
+                ubicaciones.add(airport);
+                System.out.println(airport.getNombre());
 
-                    // Dibujar el aeropuerto
-                    drawAirport(gc, x, y, airport.getNombre());
+                // Dibujar el aeropuerto
+                drawAirport(gc, x, y, airport.getNombre());
 
-                    System.out.println("Aeropuerto " + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
+                System.out.println("Aeropuerto " + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
 
-                    graph.addNode(latitude, longitude);
-                }
+                graph.addNode(airport);
+            }
 
-                if (!isOnLand) {
-                    // Obtener las coordenadas de latitud y longitud
-                    double latitude = convertYToLatitude(y);
-                    double longitude = convertXToLongitude(x);
+            if (!isOnLand) {
+                // Obtener las coordenadas de latitud y longitud
+                double latitude = convertYToLatitude(y);
+                double longitude = convertXToLongitude(x);
 
-                    Portaavion portaAviones = new Portaavion(("Portaaviones " + i), 10, latitude, longitude);
-                    portaAvionesList.add(portaAviones);
-                    System.out.println(portaAviones.getNombre());
+                Portaavion portaAviones = new Portaavion(("Portaaviones " + i), 10, latitude, longitude);
+                ubicaciones.add(portaAviones);
+                System.out.println(portaAviones.getNombre());
 
-                    // Dibujar el portaaviones
-                    drawAirport(gc, x, y, portaAviones.getNombre());
+                // Dibujar el portaaviones
+                drawAirport(gc, x, y, portaAviones.getNombre());
 
-                    System.out.println("Portaaviones " + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
+                System.out.println("Portaaviones " + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
 
-                    graph.addNode(latitude, longitude);
-                }
-             
+                graph.addNode(portaAviones);
+            }
+
         }
     }
 
-
-
-private List<Integer> generateRandomTargets(int sourceIndex, Random random) {
+    private List<Integer> generateRandomTargets(int sourceIndex, Random random) {
         List<Integer> randomTargets = new ArrayList<>();
 
         for (int i = 0; i < NUM_AIRPORTS; i++) {
@@ -223,174 +220,147 @@ private List<Integer> generateRandomTargets(int sourceIndex, Random random) {
     public static void main(String[] args) {
         launch(args);
 
-}
-
-    private static class Graph {
-
-    private List<Node> nodes;
-    private int[][] adjacencyMatrix;
-
-    public Graph() {
-        nodes = new ArrayList<>();
-        adjacencyMatrix = new int[0][0];
     }
 
-    public void addNode(double latitude, double longitude) {
-        Node node = new Node(latitude, longitude);
-        nodes.add(node);
+    public class Graph {
 
-        int[][] newMatrix = new int[nodes.size()][nodes.size()];
-        for (int i = 0; i < adjacencyMatrix.length; i++) {
-            System.arraycopy(adjacencyMatrix[i], 0, newMatrix[i], 0, adjacencyMatrix[i].length);
+        private List<Lugar> nodes;
+        private Ruta[][] adjacencyMatrix;
+
+        public Graph() {
+            nodes = new ArrayList<>();
+            adjacencyMatrix = new Ruta[0][0];
         }
-        adjacencyMatrix = newMatrix;
+
+        public void addNode(Lugar lugar) {
+            nodes.add(lugar);
+
+            Ruta[][] newMatrix = new Ruta[nodes.size()][nodes.size()];
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                System.arraycopy(adjacencyMatrix[i], 0, newMatrix[i], 0, adjacencyMatrix[i].length);
+            }
+            adjacencyMatrix = newMatrix;
+        }
+
+        public void printAdjacencyMatrix() {
+    int numNodes = nodes.size();
+
+    System.out.print("     ");
+    for (int i = 0; i < numNodes; i++) {
+        System.out.printf("%5d", i);
     }
+    System.out.println();
 
-    public void printAdjacencyMatrix() {
-        int numNodes = nodes.size();
-
-        System.out.print("  ");
-        for (int i = 0; i < numNodes; i++) {
-            System.out.printf("%3d", i);
+    for (int i = 0; i < numNodes; i++) {
+        System.out.printf("%5d", i);
+        for (int j = 0; j < numNodes; j++) {
+            if (adjacencyMatrix[i][j] == null) {
+                System.out.printf("%5s", "0");
+            } else {
+                System.out.printf("%5d", (int) adjacencyMatrix[i][j].calcularPeso());
+            }
         }
         System.out.println();
+    }
+}
 
-        for (int i = 0; i < numNodes; i++) {
-            System.out.printf("%2d ", i);
-            for (int j = 0; j < numNodes; j++) {
-                System.out.printf("%3d", adjacencyMatrix[i][j]);
-            }
-            System.out.println();
+
+        public Lugar getNode(int index) {
+            return nodes.get(index);
         }
-    }
 
-    public Node getNode(int index) {
-        return nodes.get(index);
-    }
+        public void addEdge(Lugar source, Lugar target, int weight) {
+            int sourceIndex = nodes.indexOf(source);
+            int targetIndex = nodes.indexOf(target);
+            Ruta ruta = new Ruta(source, target, weight);
+            adjacencyMatrix[sourceIndex][targetIndex] = ruta;
+            adjacencyMatrix[targetIndex][sourceIndex] = ruta;
+        }
 
-    public void addEdge(int source, int target, int weight) {
-        adjacencyMatrix[source][target] = weight;
-        adjacencyMatrix[target][source] = weight; // Agregar también la arista inversa
-    }
+        public List<Lugar> shortestPath(Lugar source, Lugar target) {
+            int numNodes = nodes.size();
+            int sourceIndex = nodes.indexOf(source);
+            int targetIndex = nodes.indexOf(target);
 
-    public List<Integer> shortestPath(int source, int target) {
-        int numNodes = nodes.size();
+            int[] distances = new int[numNodes];
+            Arrays.fill(distances, Integer.MAX_VALUE);
+            distances[sourceIndex] = 0;
 
-        int[] distances = new int[numNodes];
-        Arrays.fill(distances, Integer.MAX_VALUE);
-        distances[source] = 0;
+            boolean[] visited = new boolean[numNodes];
 
-        boolean[] visited = new boolean[numNodes];
+            int[] previous = new int[numNodes];
+            Arrays.fill(previous, -1);
 
-        int[] previous = new int[numNodes];
-        Arrays.fill(previous, -1);
+            PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
+            pq.offer(new NodeDistance(sourceIndex, 0));
 
-        PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
-        pq.offer(new NodeDistance(source, 0));
+            while (!pq.isEmpty()) {
+                NodeDistance minNode = pq.poll();
+                int node = minNode.getNode();
 
-        while (!pq.isEmpty()) {
-            NodeDistance minNode = pq.poll();
-            int node = minNode.getNode();
+                if (node == targetIndex) {
+                    break;  // Encontró el nodo destino, termina el algoritmo
+                }
 
-            if (node == target) {
-                break;  // Encontró el nodo destino, termina el algoritmo
-            }
+                if (visited[node]) {
+                    continue;  // Nodo ya visitado, pasa al siguiente
+                }
 
-            if (visited[node]) {
-                continue;  // Nodo ya visitado, pasa al siguiente
-            }
+                visited[node] = true;
 
-            visited[node] = true;
+                for (int neighbor = 0; neighbor < numNodes; neighbor++) {
+                    if (adjacencyMatrix[node][neighbor] != null) {
+                        double distance = (double) (distances[node] + adjacencyMatrix[node][neighbor].calcularPeso());
 
-            for (int neighbor = 0; neighbor < numNodes; neighbor++) {
-                if (adjacencyMatrix[node][neighbor] > 0) {
-                    int distance = distances[node] + adjacencyMatrix[node][neighbor];
-
-                    if (distance < distances[neighbor]) {
-                        distances[neighbor] = distance;
-                        previous[neighbor] = node;
-                        pq.offer(new NodeDistance(neighbor, distance));
+                        if (distance < distances[neighbor]) {
+                            distances[neighbor] = (int) distance;
+                            previous[neighbor] = node;
+                            pq.offer(new NodeDistance(neighbor, (int) distance));
+                        }
                     }
                 }
             }
+
+            // Reconstruye la ruta desde el nodo objetivo hasta el nodo fuente
+            List<Integer> path = new ArrayList<>();
+            int current = targetIndex;
+
+            while (current != -1) {
+                path.add(0, current);
+                current = previous[current];
+            }
+
+            List<Lugar> pathLugares = new ArrayList<>();
+            for (int index : path) {
+                pathLugares.add(nodes.get(index));
+            }
+
+            return pathLugares;
         }
 
-        // Reconstruye la ruta desde el nodo objetivo hasta el nodo fuente
-        List<Integer> path = new ArrayList<>();
-        int current = target;
+        private static class NodeDistance implements Comparable<NodeDistance> {
 
-        while (current != -1) {
-            path.add(0, current);
-            current = previous[current];
+            private int node;
+            private int distance;
+
+            public NodeDistance(int node, int distance) {
+                this.node = node;
+                this.distance = distance;
+            }
+
+            public int getNode() {
+                return node;
+            }
+
+            public int getDistance() {
+                return distance;
+            }
+
+            @Override
+            public int compareTo(NodeDistance other) {
+                return Integer.compare(distance, other.distance);
+            }
         }
-
-        return path;
     }
-}
-
-private static class NodeDistance implements Comparable<NodeDistance> {
-
-    private int node;
-    private int distance;
-
-    public NodeDistance(int node, int distance) {
-        this.node = node;
-        this.distance = distance;
-    }
-
-    public int getNode() {
-        return node;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    @Override
-    public int compareTo(NodeDistance other) {
-        return Integer.compare(distance, other.distance);
-    }
-}
-
-private static class Node {
-
-    private double latitude;
-    private double longitude;
-    private double x;
-    private double y;
-
-    public Node(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.x = convertLongitudeToX(longitude);
-        this.y = convertLatitudeToY(latitude);
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    private double convertLatitudeToY(double latitude) {
-        double latitudeRange = 90.0; // Rango de latitudes posibles (-90 a 90)
-        return (latitude + latitudeRange / 2.0) / latitudeRange * MAP_HEIGHT;
-    }
-
-    private double convertLongitudeToX(double longitude) {
-        double longitudeRange = 180.0; // Rango de longitudes posibles (-180 a 180)
-        return (longitude + longitudeRange / 2.0) / longitudeRange * MAP_WIDTH;
-    }
-}
 
 }
