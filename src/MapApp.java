@@ -14,10 +14,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.animation.AnimationTimer;
 import static javafx.application.Application.launch;
+import javafx.application.Platform;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
+import javafx.stage.StageStyle;
 
 public class MapApp extends Application {
 
@@ -85,12 +90,123 @@ public class MapApp extends Application {
         System.out.println(ubicaciones);
         graph.printAdjacencyMatrix();
         System.out.println("Mas corto: " + graph.shortestPath(ubicaciones.get(0), ubicaciones.get(3)));
+        List<Lugar> ruta = graph.shortestPath(ubicaciones.get(0), ubicaciones.get(4));
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
+        Thread thread = new Thread(() -> {
+            while (ruta.size() >= 2) {
+                Lugar start = ruta.get(0);
+                Lugar end = ruta.get(1);
+                Platform.runLater(() -> drawTravelingBall(start, end));
+                ruta.remove(0);
+                try {
+                    Thread.sleep(5000); // Pausa de 1 segundo (1000 milisegundos)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+        //drawTravelingBall(ubicaciones.get(0), ubicaciones.get(4));
 
         primaryStage.setTitle("Map App");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        
+    }
+
+    public void drawTravelingBall(Lugar source, Lugar target) {
+        // Convertir las coordenadas de latitud y longitud a coordenadas cartesianas
+        double startX = convertLongitudeToX(source.getLongitude());
+        double startY = convertLatitudeToY(source.getLatitude());
+        double endX = convertLongitudeToX(target.getLongitude());
+        double endY = convertLatitudeToY(target.getLatitude());
+        // Crear un nuevo Stage para la animación
+        Stage animationStage = new Stage();
+        animationStage.initStyle(StageStyle.TRANSPARENT);
+        animationStage.setAlwaysOnTop(true);
+
+        // Crear un nuevo Canvas para la animación
+        Canvas animationCanvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
+        GraphicsContext animationGC = animationCanvas.getGraphicsContext2D();
+
+        // Configurar el Stage y la escena
+        StackPane root = new StackPane(animationCanvas);
+        Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
+        scene.setFill(Color.TRANSPARENT);
+        animationStage.setScene(scene);
+        animationStage.show();
+
+        // Configurar la animación
+        final int framesPerSecond = 60;
+        final double duration = 5; // Duración de la animación en segundos
+        final double totalFrames = framesPerSecond * duration;
+
+        double currentX = startX;
+        double currentY = startY;
+        Avion avionDespachado = source.despacharAvion();
+        AnimationTimer animationTimer = new AnimationTimer() {
+            private double frameCount = 0;
+
+            @Override
+            public void handle(long now) {
+                frameCount++;
+
+                if (frameCount <= totalFrames) {
+                    // Calcular la posición actual de la bola
+                    double t = frameCount / totalFrames;
+                    double currentPosX = startX + t * (endX - startX);
+                    double currentPosY = startY + t * (endY - startY);
+
+                    // Limpiar el canvas y dibujar el mapa
+                    animationGC.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+                    //drawMap(animationGC);
+
+                    // Dibujar la ruta
+                    //drawRoute(animationGC, startX, startY, endX, endY);
+                    // Dibujar la bola en la posición actual
+                    animationGC.setFill(Color.BLACK);
+                    animationGC.fillOval(currentPosX + 6, currentPosY + 6, 10, 10);
+                } else {
+                    try {
+                        // La animación ha terminado, detener el AnimationTimer
+                        stop();
+
+                    } catch (Exception ex) {
+                        Logger.getLogger(MapApp.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    // Cerrar el Stage de la animación
+                    animationStage.close();
+
+                    // Actualizar el mapa principal con la bola en la posición final
+                    //gc.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+                    //drawMap(gc);
+                    //drawRoute(gc, startX, startY, endX, endY);
+                    //gc.setFill(Color.BLACK);
+                    //gc.fillOval(endX - 5, endY - 5, 10, 10);
+                    target.recibirAvion(avionDespachado);
+                }
+            }
+        };
+
+        // Iniciar la animación
+        animationTimer.start();
+
+    }
+
+    private double convertLongitudeToX(double longitude) {
+        // Convertir la longitud a la coordenada X correspondiente
+        double longitudeRange = 180.0; // Rango de longitudes posibles (-180 a 180)
+        return (longitude + longitudeRange / 2.0) / longitudeRange * MAP_WIDTH;
+    }
+
+    private double convertLatitudeToY(double latitude) {
+        // Convertir la latitud a la coordenada Y correspondiente
+        double latitudeRange = 90.0; // Rango de latitudes posibles (-90 a 90)
+        return (latitude + latitudeRange / 2.0) / latitudeRange * MAP_HEIGHT;
     }
 
     private void generateRandomAirports(Random random) {
@@ -114,7 +230,15 @@ public class MapApp extends Application {
                 double latitude = convertYToLatitude(y);
                 double longitude = convertXToLongitude(x);
 
-                AirPort airport = new AirPort("Aeropuerto " + i, ((random.nextInt(3)) + 3), latitude, longitude);
+                AirPort airport = new AirPort("Aeropuerto " + i, ((random.nextInt(4)) + 5), latitude, longitude);
+
+                int z = 0;
+                while (z < airport.getCapHang() - ((random.nextInt(4)) +2)) {
+                    Avion avion = new Avion("Avion", 10, 12, 3);
+                    airport.recibirAvion(avion);
+                    z++;
+                }
+
                 ubicaciones.add(airport);
                 System.out.println(airport.getNombre());
 
@@ -131,13 +255,19 @@ public class MapApp extends Application {
                 double latitude = convertYToLatitude(y);
                 double longitude = convertXToLongitude(x);
 
-                Portaavion portaAviones = new Portaavion(("Portaaviones " + i), 10, latitude, longitude);
+                Portaavion portaAviones = new Portaavion(("Portaaviones " + i), ((random.nextInt(4)) +2), latitude, longitude);
                 ubicaciones.add(portaAviones);
                 System.out.println(portaAviones.getNombre());
-
+                Avion avion = new Avion("Avion", 10, 12, 3);
+                portaAviones.recibirAvion(avion);
                 // Dibujar el portaaviones
                 drawAirport(gc, x, y, portaAviones.getNombre());
-
+                int z = 0;
+                while (z < portaAviones.getCapHang() - ((random.nextInt(4)) +2)) {
+                    Avion avionPortaAvion = new Avion("Avion", 10, 12, 3);
+                    portaAviones.recibirAvion(avionPortaAvion);
+                    z++;
+                }
                 System.out.println("Portaaviones " + (i + 1) + ": Latitud = " + latitude + ", Longitud = " + longitude);
 
                 graph.addNode(portaAviones);
@@ -243,27 +373,26 @@ public class MapApp extends Application {
         }
 
         public void printAdjacencyMatrix() {
-    int numNodes = nodes.size();
+            int numNodes = nodes.size();
 
-    System.out.print("     ");
-    for (int i = 0; i < numNodes; i++) {
-        System.out.printf("%5d", i);
-    }
-    System.out.println();
+            System.out.print("     ");
+            for (int i = 0; i < numNodes; i++) {
+                System.out.printf("%5d", i);
+            }
+            System.out.println();
 
-    for (int i = 0; i < numNodes; i++) {
-        System.out.printf("%5d", i);
-        for (int j = 0; j < numNodes; j++) {
-            if (adjacencyMatrix[i][j] == null) {
-                System.out.printf("%5s", "0");
-            } else {
-                System.out.printf("%5d", (int) adjacencyMatrix[i][j].calcularPeso());
+            for (int i = 0; i < numNodes; i++) {
+                System.out.printf("%5d", i);
+                for (int j = 0; j < numNodes; j++) {
+                    if (adjacencyMatrix[i][j] == null) {
+                        System.out.printf("%5s", "0");
+                    } else {
+                        System.out.printf("%5d", (int) adjacencyMatrix[i][j].calcularPeso());
+                    }
+                }
+                System.out.println();
             }
         }
-        System.out.println();
-    }
-}
-
 
         public Lugar getNode(int index) {
             return nodes.get(index);

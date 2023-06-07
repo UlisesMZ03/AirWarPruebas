@@ -31,4 +31,7 @@ public abstract class Lugar {
         double latitudeRange = 90.0;
         return (latitude + latitudeRange / 2.0) / latitudeRange * 720;
     }
+    public abstract void recibirAvion(Avion avion);
+
+    public abstract Avion despacharAvion();
 }

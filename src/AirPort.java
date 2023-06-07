@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AirPort extends Lugar {
+
     private String nombre;
     private int capacidadHangares;
     private List<Avion> avionesEsperando;
@@ -15,7 +16,7 @@ public class AirPort extends Lugar {
         this.avionesEsperando = new ArrayList<>();
         this.combustibleDisponible = 0;
     }
-
+@Override
     public void recibirAvion(Avion avion) {
         if (avionesEsperando.size() < capacidadHangares) {
             avionesEsperando.add(avion);
@@ -25,23 +26,27 @@ public class AirPort extends Lugar {
         }
     }
 
-    public void despacharAvion() {
+    @Override
+    public Avion despacharAvion() {
         if (!avionesEsperando.isEmpty()) {
             Avion avionDespachado = avionesEsperando.remove(0);
             System.out.println("Avión " + avionDespachado + " despachado desde el aeropuerto " + nombre);
+            return avionDespachado;
         } else {
             System.out.println("No hay aviones esperando en el aeropuerto " + nombre);
+            return null;
         }
     }
 
     // Otros métodos y getters/setters según sea necesario
-
     public double getLatitude() {
         return latitude;
     }
+
     public double getCapHang() {
         return capacidadHangares;
     }
+
     public String getNombre() {
         return nombre;
     }

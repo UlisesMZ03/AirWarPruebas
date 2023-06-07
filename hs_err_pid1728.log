@@ -1,0 +1,401 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (malloc) failed to allocate 145920 bytes for Chunk::new
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+#   JVM is running with Zero Based Compressed Oops mode in which the Java heap is
+#     placed in the first 32GB address space. The Java Heap base address is the
+#     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+#     to set the Java Heap base and to place the Java Heap above 32GB virtual address.
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (arena.cpp:184), pid=1728, tid=5400
+#
+# JRE version: OpenJDK Runtime Environment Zulu19.32+15-CA (19.0.2+7) (build 19.0.2+7)
+# Java VM: OpenJDK 64-Bit Server VM Zulu19.32+15-CA (19.0.2+7, mixed mode, tiered, compressed oops, compressed class ptrs, g1 gc, windows-amd64)
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dapplication.home=C:\Program Files\Zulu\zulu-19 --add-modules=ALL-DEFAULT -Xms8m -Djdk.module.main=jdk.compiler jdk.compiler/com.sun.tools.javac.Main -d C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\classes -classpath C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\classes -sourcepath C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\src -target 19 -encoding UTF-8 -g -processorpath C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\empty -s C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\generated-sources\ap-source-output -source 19 C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\src\MapApp.java
+
+Host: Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz, 12 cores, 15G,  Windows 11 , 64 bit Build 22621 (10.0.22621.1635)
+Time: Tue Jun  6 16:49:06 2023 Hora estándar, América Central elapsed time: 0.113089 seconds (0d 0h 0m 0s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000001f304157820):  JavaThread "C2 CompilerThread0" daemon [_thread_in_native, id=5400, stack(0x000000bad2c00000,0x000000bad2d00000)]
+
+
+Current CompileTask:
+C2:    113  145       4       java.util.HashMap::putVal (300 bytes)
+
+Stack: [0x000000bad2c00000,0x000000bad2d00000]
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x6eab2a]
+V  [jvm.dll+0x8a4a20]
+V  [jvm.dll+0x8a640e]
+V  [jvm.dll+0x8a6ac3]
+V  [jvm.dll+0x27c1ef]
+V  [jvm.dll+0xc245f]
+V  [jvm.dll+0xc27d5]
+V  [jvm.dll+0x3b80ab]
+V  [jvm.dll+0x381701]
+V  [jvm.dll+0x380b8a]
+V  [jvm.dll+0x2458db]
+V  [jvm.dll+0x244c71]
+V  [jvm.dll+0x1cf9a1]
+V  [jvm.dll+0x254799]
+V  [jvm.dll+0x2529a8]
+V  [jvm.dll+0x854e98]
+V  [jvm.dll+0x84ec7a]
+V  [jvm.dll+0x6e981b]
+C  [ucrtbase.dll+0x29363]
+C  [KERNEL32.DLL+0x126ad]
+C  [ntdll.dll+0x5a9f8]
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x000001f304396cc0, length=13, elements={
+0x000001f344c69a90, 0x000001f3697e85f0, 0x000001f30416c410, 0x000001f304152760,
+0x000001f3041538a0, 0x000001f3041561e0, 0x000001f304156b10, 0x000001f304157820,
+0x000001f304142480, 0x000001f304142df0, 0x000001f304282430, 0x000001f304308e40,
+0x000001f3043b20d0
+}
+
+Java Threads: ( => current thread )
+  0x000001f344c69a90 JavaThread "main" [_thread_in_vm, id=16992, stack(0x000000bad1f00000,0x000000bad2000000)]
+  0x000001f3697e85f0 JavaThread "Reference Handler" daemon [_thread_blocked, id=2088, stack(0x000000bad2600000,0x000000bad2700000)]
+  0x000001f30416c410 JavaThread "Finalizer" daemon [_thread_blocked, id=17652, stack(0x000000bad2700000,0x000000bad2800000)]
+  0x000001f304152760 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=5204, stack(0x000000bad2800000,0x000000bad2900000)]
+  0x000001f3041538a0 JavaThread "Attach Listener" daemon [_thread_blocked, id=17532, stack(0x000000bad2900000,0x000000bad2a00000)]
+  0x000001f3041561e0 JavaThread "Service Thread" daemon [_thread_blocked, id=6808, stack(0x000000bad2a00000,0x000000bad2b00000)]
+  0x000001f304156b10 JavaThread "Monitor Deflation Thread" daemon [_thread_blocked, id=1392, stack(0x000000bad2b00000,0x000000bad2c00000)]
+=>0x000001f304157820 JavaThread "C2 CompilerThread0" daemon [_thread_in_native, id=5400, stack(0x000000bad2c00000,0x000000bad2d00000)]
+  0x000001f304142480 JavaThread "C1 CompilerThread0" daemon [_thread_blocked, id=9196, stack(0x000000bad2d00000,0x000000bad2e00000)]
+  0x000001f304142df0 JavaThread "Sweeper thread" daemon [_thread_blocked, id=11252, stack(0x000000bad2e00000,0x000000bad2f00000)]
+  0x000001f304282430 JavaThread "Common-Cleaner" daemon [_thread_blocked, id=15480, stack(0x000000bad2f00000,0x000000bad3000000)]
+  0x000001f304308e40 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=4192, stack(0x000000bad3000000,0x000000bad3100000)]
+  0x000001f3043b20d0 JavaThread "Notification Thread" daemon [_thread_blocked, id=15384, stack(0x000000bad3100000,0x000000bad3200000)]
+
+Other Threads:
+  0x000001f3697ebc60 VMThread "VM Thread" [stack: 0x000000bad2500000,0x000000bad2600000] [id=1600]
+  0x000001f3043b2610 WatcherThread "VM Periodic Task Thread" [stack: 0x000000bad3200000,0x000000bad3300000] [id=13316]
+  0x000001f344cdcae0 WorkerThread "GC Thread#0" [stack: 0x000000bad2000000,0x000000bad2100000] [id=10660]
+  0x000001f344cedbd0 ConcurrentGCThread "G1 Main Marker" [stack: 0x000000bad2100000,0x000000bad2200000] [id=5112]
+  0x000001f344cefc50 WorkerThread "G1 Conc#0" [stack: 0x000000bad2200000,0x000000bad2300000] [id=4672]
+  0x000001f344d225d0 ConcurrentGCThread "G1 Refine#0" [stack: 0x000000bad2300000,0x000000bad2400000] [id=8196]
+  0x000001f344d22fb0 ConcurrentGCThread "G1 Service" [stack: 0x000000bad2400000,0x000000bad2500000] [id=15856]
+
+Threads with active compile tasks:
+C2 CompilerThread0      121  145       4       java.util.HashMap::putVal (300 bytes)
+
+VM state: not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x000001f344c63ca0] Metaspace_lock - owner thread: 0x000001f344c69a90
+
+Heap address: 0x0000000701600000, size: 4074 MB, Compressed Oops mode: Zero based, Oop shift amount: 3
+
+CDS archive(s) not mapped
+Compressed class space mapped at: 0x0000000800000000-0x0000000840000000, reserved size: 1073741824
+Narrow klass base: 0x0000000800000000, Narrow klass shift: 0, Narrow klass range: 0x40000000
+
+GC Precious Log:
+ CardTable entry size: 512
+ Card Set container configuration: InlinePtr #cards 4 size 8 Array Of Cards #cards 16 size 48 Howl #buckets 8 coarsen threshold 3686 Howl Bitmap #cards 512 size 80 coarsen threshold 460 Card regions per heap region 1 cards per card region 4096
+ CPUs: 12 total, 12 available
+ Memory: 16291M
+ Large Page Support: Disabled
+ NUMA Support: Disabled
+ Compressed Oops: Enabled (Zero based)
+ Heap Region Size: 2M
+ Heap Min Capacity: 8M
+ Heap Initial Capacity: 8M
+ Heap Max Capacity: 4074M
+ Pre-touch: Disabled
+ Parallel Workers: 10
+ Concurrent Workers: 3
+ Concurrent Refinement Workers: 10
+ Periodic GC: Disabled
+
+Heap:
+ garbage-first heap   total 8192K, used 0K [0x0000000701600000, 0x0000000800000000)
+  region size 2048K, 1 young (2048K), 0 survivors (0K)
+ Metaspace       used 5764K, committed 5888K, reserved 1114112K
+  class space    used 450K, committed 512K, reserved 1048576K
+
+Heap Regions: E=young(eden), S=young(survivor), O=old, HS=humongous(starts), HC=humongous(continues), CS=collection set, F=free, OA=open archive, CA=closed archive, TAMS=top-at-mark-start (previous, next)
+|   0|0x0000000701600000, 0x0000000701600000, 0x0000000701800000|  0%| F|  |TAMS 0x0000000701600000, 0x0000000701600000| Untracked 
+|   1|0x0000000701800000, 0x0000000701800000, 0x0000000701a00000|  0%| F|  |TAMS 0x0000000701800000, 0x0000000701800000| Untracked 
+|   2|0x0000000701a00000, 0x0000000701a00000, 0x0000000701c00000|  0%| F|  |TAMS 0x0000000701a00000, 0x0000000701a00000| Untracked 
+|   3|0x0000000701c00000, 0x0000000701d8ab70, 0x0000000701e00000| 77%| E|  |TAMS 0x0000000701c00000, 0x0000000701c00000| Complete 
+
+Card table byte_map: [0x000001f35dc40000,0x000001f35e440000] _byte_map_base: 0x000001f35a435000
+
+Marking Bits (Prev, Next): (CMBitMap*) 0x000001f344cdd110, (CMBitMap*) 0x000001f344cdd150
+ Prev Bits: [0x000001f35ec40000, 0x000001f362be8000)
+ Next Bits: [0x000001f362bf0000, 0x000001f366b98000)
+
+Polling page: 0x000001f342c00000
+
+Metaspace:
+
+Usage:
+  Non-class:      5.19 MB used.
+      Class:    450.55 KB used.
+       Both:      5.63 MB used.
+
+Virtual space:
+  Non-class space:       64.00 MB reserved,       5.25 MB (  8%) committed,  1 nodes.
+      Class space:        1.00 GB reserved,     512.00 KB ( <1%) committed,  1 nodes.
+             Both:        1.06 GB reserved,       5.75 MB ( <1%) committed. 
+
+Chunk freelists:
+   Non-Class:  2.50 MB
+       Class:  3.53 MB
+        Both:  6.02 MB
+
+MaxMetaspaceSize: unlimited
+CompressedClassSpaceSize: 1.00 GB
+Initial GC threshold: 21.00 MB
+Current GC threshold: 21.00 MB
+CDS: off
+MetaspaceReclaimPolicy: balanced
+ - commit_granule_bytes: 65536.
+ - commit_granule_words: 8192.
+ - virtual_space_node_default_size: 8388608.
+ - enlarge_chunks_in_place: 1.
+ - new_chunks_are_fully_committed: 0.
+ - uncommit_free_chunks: 1.
+ - use_allocation_guard: 0.
+
+
+Internal statistics:
+
+num_allocs_failed_limit: 0.
+num_arena_births: 6.
+num_arena_deaths: 0.
+num_vsnodes_births: 2.
+num_vsnodes_deaths: 0.
+num_space_committed: 92.
+num_space_uncommitted: 0.
+num_chunks_returned_to_freelist: 0.
+num_chunks_taken_from_freelist: 12.
+num_chunk_merges: 0.
+num_chunk_splits: 5.
+num_chunks_enlarged: 2.
+num_inconsistent_stats: 0.
+
+CodeHeap 'non-profiled nmethods': size=120000Kb used=54Kb max_used=54Kb free=119945Kb
+ bounds [0x000001f3559a0000, 0x000001f355c10000, 0x000001f35ced0000]
+CodeHeap 'profiled nmethods': size=120000Kb used=188Kb max_used=188Kb free=119811Kb
+ bounds [0x000001f34ded0000, 0x000001f34e140000, 0x000001f355400000]
+CodeHeap 'non-nmethods': size=5760Kb used=1174Kb max_used=1180Kb free=4585Kb
+ bounds [0x000001f355400000, 0x000001f355670000, 0x000001f3559a0000]
+ total_blobs=539 nmethods=177 adapters=273
+ compilation: enabled
+              stopped_count=0, restarted_count=0
+ full_count=0
+
+Compilation events (20 events):
+Event: 0.110 Thread 0x000001f304142480  166       3       java.util.HashMap$KeyIterator::<init> (6 bytes)
+Event: 0.110 Thread 0x000001f304142480 nmethod 166 0x000001f34defc710 code [0x000001f34defc8c0, 0x000001f34defca08]
+Event: 0.110 Thread 0x000001f304142480  167       3       java.util.HashSet::iterator (13 bytes)
+Event: 0.110 Thread 0x000001f304308e40  170       4       java.util.HashMap::newNode (13 bytes)
+Event: 0.110 Thread 0x000001f304142480 nmethod 167 0x000001f34defca90 code [0x000001f34defcc40, 0x000001f34defced8]
+Event: 0.110 Thread 0x000001f304142480  160       1       java.lang.module.ModuleDescriptor$Version::toString (5 bytes)
+Event: 0.110 Thread 0x000001f304142480 nmethod 160 0x000001f3559ac310 code [0x000001f3559ac4a0, 0x000001f3559ac578]
+Event: 0.110 Thread 0x000001f304142480  163       3       java.util.ImmutableCollections$MapN::get (35 bytes)
+Event: 0.110 Thread 0x000001f304142480 nmethod 163 0x000001f34defd010 code [0x000001f34defd200, 0x000001f34defd5b8]
+Event: 0.111 Thread 0x000001f304142480  168       1       java.lang.module.ResolvedModule::configuration (5 bytes)
+Event: 0.111 Thread 0x000001f304142480 nmethod 168 0x000001f3559ac610 code [0x000001f3559ac7a0, 0x000001f3559ac878]
+Event: 0.111 Thread 0x000001f304142480  169       1       java.lang.module.ModuleDescriptor::isOpen (5 bytes)
+Event: 0.111 Thread 0x000001f304142480 nmethod 169 0x000001f3559ac910 code [0x000001f3559acaa0, 0x000001f3559acb78]
+Event: 0.111 Thread 0x000001f304142480  171       1       java.util.HashMap::size (5 bytes)
+Event: 0.111 Thread 0x000001f304142480 nmethod 171 0x000001f3559acc10 code [0x000001f3559acda0, 0x000001f3559ace58]
+Event: 0.111 Thread 0x000001f304142480  172       1       java.lang.module.ModuleDescriptor$Provides::service (5 bytes)
+Event: 0.111 Thread 0x000001f304142480 nmethod 172 0x000001f3559acf10 code [0x000001f3559ad0a0, 0x000001f3559ad178]
+Event: 0.111 Thread 0x000001f304308e40 nmethod 170 0x000001f3559ad210 code [0x000001f3559ad3a0, 0x000001f3559ad4b8]
+Event: 0.111 Thread 0x000001f304308e40  173       4       java.util.ImmutableCollections$SetN::isEmpty (13 bytes)
+Event: 0.111 Thread 0x000001f304308e40 nmethod 173 0x000001f3559ad590 code [0x000001f3559ad700, 0x000001f3559ad798]
+
+GC Heap History (0 events):
+No events
+
+Dll operation events (2 events):
+Event: 0.006 Loaded shared library C:\Program Files\Zulu\zulu-19\bin\java.dll
+Event: 0.031 Loaded shared library C:\Program Files\Zulu\zulu-19\bin\jsvml.dll
+
+Deoptimization events (0 events):
+No events
+
+Classes loaded (20 events):
+Event: 0.108 Loading class jdk/internal/module/ModuleLoaderMap done
+Event: 0.108 Loading class jdk/internal/module/ModuleLoaderMap$Mapper
+Event: 0.108 Loading class jdk/internal/module/ModuleLoaderMap$Mapper done
+Event: 0.108 Loading class jdk/internal/module/ModuleLoaderMap$Modules
+Event: 0.108 Loading class jdk/internal/module/ModuleLoaderMap$Modules done
+Event: 0.111 Loading class jdk/internal/loader/AbstractClassLoaderValue$Memoizer
+Event: 0.111 Loading class jdk/internal/loader/AbstractClassLoaderValue$Memoizer done
+Event: 0.111 Loading class jdk/internal/module/ServicesCatalog$ServiceProvider
+Event: 0.111 Loading class jdk/internal/module/ServicesCatalog$ServiceProvider done
+Event: 0.111 Loading class java/util/concurrent/CopyOnWriteArrayList
+Event: 0.111 Loading class java/util/concurrent/CopyOnWriteArrayList done
+Event: 0.111 Loading class java/lang/ModuleLayer$Controller
+Event: 0.111 Loading class java/lang/ModuleLayer$Controller done
+Event: 0.111 Loading class jdk/internal/module/ModuleBootstrap$SafeModuleFinder
+Event: 0.111 Loading class jdk/internal/module/ModuleBootstrap$SafeModuleFinder done
+Event: 0.111 Loading class java/lang/invoke/StringConcatFactory
+Event: 0.111 Loading class java/lang/invoke/StringConcatFactory done
+Event: 0.112 Loading class jdk/internal/vm/PostVMInitHook
+Event: 0.112 Loading class jdk/internal/vm/PostVMInitHook done
+Event: 0.112 Loading class sun/launcher/LauncherHelper
+
+Classes unloaded (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (0 events):
+No events
+
+VM Operations (2 events):
+Event: 0.103 Executing VM operation: HandshakeAllThreads
+Event: 0.103 Executing VM operation: HandshakeAllThreads done
+
+Events (13 events):
+Event: 0.031 Thread 0x000001f344c69a90 Thread added: 0x000001f344c69a90
+Event: 0.052 Thread 0x000001f3697e85f0 Thread added: 0x000001f3697e85f0
+Event: 0.052 Thread 0x000001f30416c410 Thread added: 0x000001f30416c410
+Event: 0.052 Thread 0x000001f304152760 Thread added: 0x000001f304152760
+Event: 0.052 Thread 0x000001f3041538a0 Thread added: 0x000001f3041538a0
+Event: 0.052 Thread 0x000001f3041561e0 Thread added: 0x000001f3041561e0
+Event: 0.053 Thread 0x000001f304156b10 Thread added: 0x000001f304156b10
+Event: 0.053 Thread 0x000001f304157820 Thread added: 0x000001f304157820
+Event: 0.053 Thread 0x000001f304142480 Thread added: 0x000001f304142480
+Event: 0.053 Thread 0x000001f304142df0 Thread added: 0x000001f304142df0
+Event: 0.092 Thread 0x000001f304282430 Thread added: 0x000001f304282430
+Event: 0.107 Thread 0x000001f304308e40 Thread added: 0x000001f304308e40
+Event: 0.112 Thread 0x000001f3043b20d0 Thread added: 0x000001f3043b20d0
+
+
+Dynamic libraries:
+0x00007ff7e6630000 - 0x00007ff7e6638000 	C:\Program Files\Zulu\zulu-19\bin\javac.exe
+0x00007ffd7f890000 - 0x00007ffd7faa4000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007ffd7dc60000 - 0x00007ffd7dd22000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007ffd7d260000 - 0x00007ffd7d603000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007ffd7cda0000 - 0x00007ffd7ceb1000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007ffd77f40000 - 0x00007ffd77f57000 	C:\Program Files\Zulu\zulu-19\bin\jli.dll
+0x00007ffd76290000 - 0x00007ffd762ab000 	C:\Program Files\Zulu\zulu-19\bin\VCRUNTIME140.dll
+0x00007ffd7dd40000 - 0x00007ffd7deeb000 	C:\WINDOWS\System32\USER32.dll
+0x00007ffd7ccb0000 - 0x00007ffd7ccd6000 	C:\WINDOWS\System32\win32u.dll
+0x00007ffd65f20000 - 0x00007ffd661ae000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.22621.1635_none_270f70857386168e\COMCTL32.dll
+0x00007ffd7d6f0000 - 0x00007ffd7d719000 	C:\WINDOWS\System32\GDI32.dll
+0x00007ffd7f230000 - 0x00007ffd7f2d7000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007ffd7cf30000 - 0x00007ffd7d048000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007ffd7d1c0000 - 0x00007ffd7d25a000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007ffd7e0b0000 - 0x00007ffd7e0e1000 	C:\WINDOWS\System32\IMM32.DLL
+0x00007ffd77e20000 - 0x00007ffd77e2c000 	C:\Program Files\Zulu\zulu-19\bin\vcruntime140_1.dll
+0x00007ffd56300000 - 0x00007ffd5638d000 	C:\Program Files\Zulu\zulu-19\bin\msvcp140.dll
+0x00007ffd09220000 - 0x00007ffd09f27000 	C:\Program Files\Zulu\zulu-19\bin\server\jvm.dll
+0x00007ffd7dbb0000 - 0x00007ffd7dc5e000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007ffd7f180000 - 0x00007ffd7f224000 	C:\WINDOWS\System32\sechost.dll
+0x00007ffd7f630000 - 0x00007ffd7f747000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007ffd20a00000 - 0x00007ffd20a09000 	C:\WINDOWS\SYSTEM32\WSOCK32.dll
+0x00007ffd745e0000 - 0x00007ffd74614000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007ffd754e0000 - 0x00007ffd754ea000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007ffd7f5b0000 - 0x00007ffd7f621000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007ffd7bc70000 - 0x00007ffd7bc88000 	C:\WINDOWS\SYSTEM32\kernel.appcore.dll
+0x00007ffd777c0000 - 0x00007ffd777ca000 	C:\Program Files\Zulu\zulu-19\bin\jimage.dll
+0x00007ffd7a1a0000 - 0x00007ffd7a3ce000 	C:\WINDOWS\SYSTEM32\DBGHELP.DLL
+0x00007ffd7ebe0000 - 0x00007ffd7ef69000 	C:\WINDOWS\System32\combase.dll
+0x00007ffd7f2e0000 - 0x00007ffd7f3b7000 	C:\WINDOWS\System32\OLEAUT32.dll
+0x00007ffd5e180000 - 0x00007ffd5e1b2000 	C:\WINDOWS\SYSTEM32\dbgcore.DLL
+0x00007ffd7d610000 - 0x00007ffd7d68b000 	C:\WINDOWS\System32\bcryptPrimitives.dll
+0x00007ffd5df90000 - 0x00007ffd5dfb6000 	C:\Program Files\Zulu\zulu-19\bin\java.dll
+0x00007ffd47170000 - 0x00007ffd47247000 	C:\Program Files\Zulu\zulu-19\bin\jsvml.dll
+0x00007ffd7e340000 - 0x00007ffd7eb3a000 	C:\WINDOWS\System32\SHELL32.dll
+0x00007ffd7ac60000 - 0x00007ffd7b52e000 	C:\WINDOWS\SYSTEM32\windows.storage.dll
+0x00007ffd7ab20000 - 0x00007ffd7ac5e000 	C:\WINDOWS\SYSTEM32\wintypes.dll
+0x00007ffd7e110000 - 0x00007ffd7e201000 	C:\WINDOWS\System32\SHCORE.dll
+0x00007ffd7d690000 - 0x00007ffd7d6ee000 	C:\WINDOWS\System32\shlwapi.dll
+0x00007ffd7cbe0000 - 0x00007ffd7cc01000 	C:\WINDOWS\SYSTEM32\profapi.dll
+
+dbghelp: loaded successfully - version: 4.0.5 - missing functions: none
+symbol engine: initialized successfully - sym options: 0x614 - pdb path: .;C:\Program Files\Zulu\zulu-19\bin;C:\WINDOWS\SYSTEM32;C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.22621.1635_none_270f70857386168e;C:\Program Files\Zulu\zulu-19\bin\server
+
+VM Arguments:
+jvm_args: -Dapplication.home=C:\Program Files\Zulu\zulu-19 --add-modules=ALL-DEFAULT -Xms8m -Djdk.module.main=jdk.compiler 
+java_command: jdk.compiler/com.sun.tools.javac.Main -d C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\classes -classpath C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\classes -sourcepath C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\src -target 19 -encoding UTF-8 -g -processorpath C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\empty -s C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\build\generated-sources\ap-source-output -source 19 C:\Users\ulise\Desktop\TEC\Algoritmos y estructura de datos I\AirWarPruebas\src\MapApp.java
+java_class_path (initial): <not set>
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 4                                         {product} {ergonomic}
+     uint ConcGCThreads                            = 3                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 10                                        {product} {ergonomic}
+   size_t G1HeapRegionSize                         = 2097152                                   {product} {ergonomic}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 8388608                                   {product} {command line}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 4271898624                                {product} {ergonomic}
+   size_t MaxNewSize                               = 2562719744                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 2097152                                   {product} {ergonomic}
+   size_t MinHeapSize                              = 8388608                                   {product} {command line}
+    uintx NonNMethodCodeHeapSize                   = 5839372                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122909434                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122909434                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+   size_t SoftMaxHeapSize                          = 4271898624                             {manageable} {ergonomic}
+     bool UseCompressedClassPointers               = true                           {product lp64_product} {ergonomic}
+     bool UseCompressedOops                        = true                           {product lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+     bool UseLargePagesIndividualAllocation        = false                                  {pd product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags foldmultilines=false
+ #1: stderr all=off uptime,level,tags foldmultilines=false
+
+Environment Variables:
+PATH=C:\Program Files\Zulu\zulu-19\bin\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\ulise\AppData\Local\Microsoft\WindowsApps;C:\Users\ulise\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\ulise\AppData\Roaming\npm;C:\Users\ulise\AppData\Local\GitHubDesktop\bin;C:\Program Files (x86)\Nmap
+USERNAME=ulise
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 165 Stepping 2, GenuineIntel
+TMP=C:\Users\ulise\AppData\Local\Temp
+TEMP=C:\Users\ulise\AppData\Local\Temp
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS:
+ Windows 11 , 64 bit Build 22621 (10.0.22621.1635)
+OS uptime: 0 days 3:16 hours
+Hyper-V role detected
+
+CPU: total 12 (initial active 12) (6 cores per cpu, 2 threads per core) family 6 model 165 stepping 2 microcode 0xe2, cx8, cmov, fxsr, ht, mmx, 3dnowpref, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, lzcnt, tsc, tscinvbit, avx, avx2, aes, erms, clmul, bmi1, bmi2, adx, fma, vzeroupper, clflush, clflushopt, hv, rdtscp
+
+Memory: 4k page, system-wide physical 16291M (6892M free)
+TotalPageFile size 16291M (AvailPageFile size 2M)
+current process WorkingSet (physical memory assigned to process): 31M, peak: 31M
+current process commit charge ("private bytes"): 85M, peak: 85M
+
+vm_info: OpenJDK 64-Bit Server VM (19.0.2+7) for windows-amd64 JRE (19.0.2+7) (Zulu19.32+15-CA), built on Dec 28 2022 19:25:40 by "zulu_re" with MS VC++ 16.10 / 16.11 (VS2019)
+
+END.

@@ -33,9 +33,9 @@ public class Ruta {
         double peso = distancia;
 
         if (destino instanceof Portaavion) {
-            peso *= 1.2; // Aumenta el peso en un 50% si el destino es un portaaviones
+            peso *= 1.2; // Aumenta el peso en un 20% si el destino es un portaaviones
         } else {
-            peso *= 1; // Aumenta el peso en un 20% si el destino es un aeropuerto
+            peso *= 1; // Aumenta el peso en un 0% si el destino es un aeropuerto
         }
 
         peso += peligro; // Añade el valor del peligro a la distancia
