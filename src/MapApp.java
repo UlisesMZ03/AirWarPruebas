@@ -32,26 +32,34 @@ public class MapApp extends Application {
     private int nameAirport = 0;
     private Image mapImage;
     private PixelReader pixelReader;
-    private Graph graph;
+    private MapApp.Graph graph;
     List<Lugar> ubicaciones = new ArrayList<>();
 
     private GraphicsContext gc;
     private int nRoutes = 100;
+    private StackPane root;
+    private Scene scene;
+    private Canvas animationCanvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);;
 
     @Override
     public void start(Stage primaryStage) {
+
         mapImage = new Image("file:src/images/map.png");  // Ruta de la imagen del mapa
         pixelReader = mapImage.getPixelReader();
 
         Canvas canvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
         gc = canvas.getGraphicsContext2D();
-
+        root = new StackPane(canvas);
+        scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
+        primaryStage.setTitle("Map App");
+        primaryStage.setScene(scene);
+        primaryStage.show();
         // Dibujar el mapa como fondo
         drawMap(gc);
 
         // Generar ubicaciones aleatorias y colocar aeropuertos
         Random random = new Random();
-        graph = new Graph();
+        graph = new MapApp.Graph();
 
         generateRandomAirports(random);
 
@@ -90,19 +98,29 @@ public class MapApp extends Application {
         System.out.println(ubicaciones);
         graph.printAdjacencyMatrix();
         System.out.println("Mas corto: " + graph.shortestPath(ubicaciones.get(0), ubicaciones.get(8)));
-        List<Ruta> ruta = graph.shortestPath(ubicaciones.get(0), ubicaciones.get(8));
-        Avion avionn = (Avion) ruta.get(0).getSalida().getAvionesEsperando().get(0);
+
 //        List<Lugar> ruta2 = graph.shortestPath(ubicaciones.get(0), ubicaciones.get(4));
 //        
-        StackPane root = new StackPane(canvas);
-        Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
         Thread thread = new Thread(() -> {
-            while (ruta.size() >= 1) {
-                Ruta subRuta = ruta.get(0);
-                Platform.runLater(() -> drawTravelingBall(subRuta, avionn));
-                ruta.remove(0);
+            while (true) {
+                List<Ruta> ruta = graph.shortestPath(ubicaciones.get((random.nextInt(9)) + 1), ubicaciones.get((random.nextInt(9)) + 1));
                 try {
-                    Thread.sleep(6000); // Pausa de 1 segundo (1000 milisegundos)
+                    if (!ruta.get(0).getSalida().getAvionesEsperando().isEmpty()) {
+                        Avion avionn = (Avion) ruta.get(0).getSalida().getAvionesEsperando().get(0);
+                        Platform.runLater(() -> drawTravelingBall(ruta, avionn));
+                    } else {
+                        // La lista avionesEsperando está vacía, manejar este caso adecuadamente.
+                        // Por ejemplo, puedes imprimir un mensaje de error o tomar alguna acción alternativa.
+                        System.out.println("La lista avionesEsperando está vacía.");
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    // La lista avionesEsperando está vacía, manejar este caso adecuadamente.
+                    // Por ejemplo, puedes imprimir un mensaje de error o tomar alguna acción alternativa.
+                    System.out.println("La lista avionesEsperando está vacía o el índice está fuera de rango.");
+                    e.printStackTrace();
+                }
+                try {
+                    Thread.sleep(random.nextInt(4) * 1300); // Pausa de 2 segundos (2000 milisegundos)
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -110,16 +128,23 @@ public class MapApp extends Application {
         });
 
         thread.start();
-        //drawTravelingBall(ubicaciones.get(0), ubicaciones.get(4));
 
-        primaryStage.setTitle("Map App");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        
-        
+        //drawTravelingBall(ubicaciones.get(0), ubicaciones.get(4));
+//        root = new StackPane(canvas);
+//        scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
+//        primaryStage.setTitle("Map App");
+//        primaryStage.setScene(scene);
+//        primaryStage.show();
     }
 
-    public void drawTravelingBall(Ruta ruta, Avion avionn) {
+    public void drawTravelingBall(List<Ruta> rutas, Avion avionn) {
+        if (rutas.isEmpty()) {
+            // No hay rutas en la lista
+            return;
+        }
+
+        Ruta ruta = rutas.get(0); // Obtener la primera ruta de la lista
+        rutas.remove(0); // Eliminar la primera ruta de la lista
         // Convertir las coordenadas de latitud y longitud a coordenadas cartesianas
         double startX = convertLongitudeToX(ruta.getSalida().getLongitude());
         double startY = convertLatitudeToY(ruta.getSalida().getLatitude());
@@ -131,19 +156,19 @@ public class MapApp extends Application {
         animationStage.setAlwaysOnTop(true);
 
         // Crear un nuevo Canvas para la animación
-        Canvas animationCanvas = new Canvas(MAP_WIDTH, MAP_HEIGHT);
         GraphicsContext animationGC = animationCanvas.getGraphicsContext2D();
 
         // Configurar el Stage y la escena
-        StackPane root = new StackPane(animationCanvas);
-        Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
+        StackPane root2 = new StackPane(animationCanvas);
+        root.getChildren().add(root2);
+        //Scene scene = new Scene(root, MAP_WIDTH, MAP_HEIGHT);
         scene.setFill(Color.TRANSPARENT);
-        animationStage.setScene(scene);
+        //animationStage.setScene(scene);
         animationStage.show();
 
         // Configurar la animación
         final int framesPerSecond = 60;
-        final double duration = 5; // Duración de la animación en segundos
+        final double duration = 20; // Duración de la animación en segundos
         final double totalFrames = framesPerSecond * duration;
 
         double currentX = startX;
@@ -163,14 +188,14 @@ public class MapApp extends Application {
                     double currentPosY = startY + t * (endY - startY);
 
                     // Limpiar el canvas y dibujar el mapa
-                    animationGC.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+                    animationGC.clearRect(currentPosX-10, currentPosY-10, 20, 20);
                     //drawMap(animationGC);
 
                     // Dibujar la ruta
                     //drawRoute(animationGC, startX, startY, endX, endY);
                     // Dibujar la bola en la posición actual
                     animationGC.setFill(Color.BLACK);
-                    animationGC.fillOval(currentPosX + 6, currentPosY + 6, 10, 10);
+                    animationGC.fillOval(currentPosX - 5, currentPosY - 5, 10, 10);
                 } else {
                     try {
                         // La animación ha terminado, detener el AnimationTimer
@@ -181,15 +206,20 @@ public class MapApp extends Application {
                     }
 
                     // Cerrar el Stage de la animación
-                    animationStage.close();
+                    if (animationStage.isShowing()) {
+                        animationStage.close();
+                    }
 
                     // Actualizar el mapa principal con la bola en la posición final
                     //gc.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
                     //drawMap(gc);
                     //drawRoute(gc, startX, startY, endX, endY);
-                    //gc.setFill(Color.BLACK);
-                    //gc.fillOval(endX - 5, endY - 5, 10, 10);
+                    animationGC.setFill(Color.RED);
+                    animationGC.fillOval(endX - 5, endY - 5, 10, 10);
                     ruta.getDestino().recibirAvion(avionDespachado);
+
+                    // Llamar recursivamente al método para la siguiente ruta en la lista
+                    drawTravelingBall(rutas, avionn);
                 }
             }
         };
@@ -232,10 +262,10 @@ public class MapApp extends Application {
                 double latitude = convertYToLatitude(y);
                 double longitude = convertXToLongitude(x);
 
-                AirPort airport = new AirPort("Aeropuerto " + i, ((random.nextInt(4)) + 5), latitude, longitude);
+                AirPort airport = new AirPort("Aeropuerto " + i, ((random.nextInt(4)) + 10), latitude, longitude);
 
                 int z = 0;
-                while (z < airport.getCapHang() - ((random.nextInt(4)) +2)) {
+                while (z < airport.getCapHang() - ((random.nextInt(4)) + 1)) {
                     Avion avion = new Avion("Avion", 10, 12, 3);
                     airport.recibirAvion(avion);
                     z++;
@@ -257,7 +287,7 @@ public class MapApp extends Application {
                 double latitude = convertYToLatitude(y);
                 double longitude = convertXToLongitude(x);
 
-                Portaavion portaAviones = new Portaavion(("Portaaviones " + i), ((random.nextInt(4)) +2), latitude, longitude);
+                Portaavion portaAviones = new Portaavion(("Portaaviones " + i), ((random.nextInt(4)) + 2), latitude, longitude);
                 ubicaciones.add(portaAviones);
                 System.out.println(portaAviones.getNombre());
                 Avion avion = new Avion("Avion", 10, 12, 3);
@@ -265,7 +295,7 @@ public class MapApp extends Application {
                 // Dibujar el portaaviones
                 drawAirport(gc, x, y, portaAviones.getNombre());
                 int z = 0;
-                while (z < portaAviones.getCapHang() - ((random.nextInt(4)) +2)) {
+                while (z < portaAviones.getCapHang() - ((random.nextInt(4)) + 2)) {
                     Avion avionPortaAvion = new Avion("Avion", 10, 12, 3);
                     portaAviones.recibirAvion(avionPortaAvion);
                     z++;
@@ -409,69 +439,68 @@ public class MapApp extends Application {
         }
 
         public List<Ruta> shortestPath(Lugar source, Lugar target) {
-    int numNodes = nodes.size();
-    int sourceIndex = nodes.indexOf(source);
-    int targetIndex = nodes.indexOf(target);
+            int numNodes = nodes.size();
+            int sourceIndex = nodes.indexOf(source);
+            int targetIndex = nodes.indexOf(target);
 
-    int[] distances = new int[numNodes];
-    Arrays.fill(distances, Integer.MAX_VALUE);
-    distances[sourceIndex] = 0;
+            int[] distances = new int[numNodes];
+            Arrays.fill(distances, Integer.MAX_VALUE);
+            distances[sourceIndex] = 0;
 
-    boolean[] visited = new boolean[numNodes];
+            boolean[] visited = new boolean[numNodes];
 
-    int[] previous = new int[numNodes];
-    Arrays.fill(previous, -1);
+            int[] previous = new int[numNodes];
+            Arrays.fill(previous, -1);
 
-    PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
-    pq.offer(new NodeDistance(sourceIndex, 0));
+            PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
+            pq.offer(new NodeDistance(sourceIndex, 0));
 
-    while (!pq.isEmpty()) {
-        NodeDistance minNode = pq.poll();
-        int node = minNode.getNode();
+            while (!pq.isEmpty()) {
+                NodeDistance minNode = pq.poll();
+                int node = minNode.getNode();
 
-        if (node == targetIndex) {
-            break;  // Encontró el nodo destino, termina el algoritmo
-        }
+                if (node == targetIndex) {
+                    break;  // Encontró el nodo destino, termina el algoritmo
+                }
 
-        if (visited[node]) {
-            continue;  // Nodo ya visitado, pasa al siguiente
-        }
+                if (visited[node]) {
+                    continue;  // Nodo ya visitado, pasa al siguiente
+                }
 
-        visited[node] = true;
+                visited[node] = true;
 
-        for (int neighbor = 0; neighbor < numNodes; neighbor++) {
-            if (adjacencyMatrix[node][neighbor] != null) {
-                double distance = (double) (distances[node] + adjacencyMatrix[node][neighbor].calcularPeso());
+                for (int neighbor = 0; neighbor < numNodes; neighbor++) {
+                    if (adjacencyMatrix[node][neighbor] != null) {
+                        double distance = (double) (distances[node] + adjacencyMatrix[node][neighbor].calcularPeso());
 
-                if (distance < distances[neighbor]) {
-                    distances[neighbor] = (int) distance;
-                    previous[neighbor] = node;
-                    pq.offer(new NodeDistance(neighbor, (int) distance));
+                        if (distance < distances[neighbor]) {
+                            distances[neighbor] = (int) distance;
+                            previous[neighbor] = node;
+                            pq.offer(new NodeDistance(neighbor, (int) distance));
+                        }
+                    }
                 }
             }
+
+            // Reconstruye la ruta desde el nodo objetivo hasta el nodo fuente
+            List<Integer> path = new ArrayList<>();
+            int current = targetIndex;
+
+            while (current != -1) {
+                path.add(0, current);
+                current = previous[current];
+            }
+
+            List<Ruta> pathRutas = new ArrayList<>();
+            for (int i = 0; i < path.size() - 1; i++) {
+                int fromIndex = path.get(i);
+                int toIndex = path.get(i + 1);
+                Ruta ruta = adjacencyMatrix[fromIndex][toIndex];
+                pathRutas.add(ruta);
+            }
+
+            return pathRutas;
         }
-    }
-
-    // Reconstruye la ruta desde el nodo objetivo hasta el nodo fuente
-    List<Integer> path = new ArrayList<>();
-    int current = targetIndex;
-
-    while (current != -1) {
-        path.add(0, current);
-        current = previous[current];
-    }
-
-    List<Ruta> pathRutas = new ArrayList<>();
-    for (int i = 0; i < path.size() - 1; i++) {
-        int fromIndex = path.get(i);
-        int toIndex = path.get(i + 1);
-        Ruta ruta = adjacencyMatrix[fromIndex][toIndex];
-        pathRutas.add(ruta);
-    }
-
-    return pathRutas;
-}
-
 
         private static class NodeDistance implements Comparable<NodeDistance> {
 
