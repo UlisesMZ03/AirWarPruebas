@@ -28,7 +28,7 @@ public class MapApp extends Application {
     
     private static final double MAP_WIDTH = 1280;
     private static final double MAP_HEIGHT = 720;
-    private static final int NUM_AIRPORTS = 10;
+    private static final int NUM_AIRPORTS = 6;
     private int nameAirport = 0;
     private Image mapImage;
     private PixelReader pixelReader;
@@ -88,7 +88,7 @@ public class MapApp extends Application {
                     drawRoute(gc, sourceX, sourceY, targetX, targetY);
                     int weight = calculateWeight(sourceLatitude, sourceLongitude, targetLatitude, targetLongitude);
                     
-                    graph.addEdge(graph.getNode(i), graph.getNode(j), weight);
+                    graph.addEdge(graph.getNode(i), graph.getNode(j), 1);
                     
                     nodeEdgesCount[i]++;
                     nodeEdgesCount[j]++;
@@ -98,14 +98,15 @@ public class MapApp extends Application {
             }
         }
         System.out.println(ubicaciones);
+        
         graph.printAdjacencyMatrix();
-        System.out.println("Mas corto: " + graph.shortestPath(ubicaciones.get(0), ubicaciones.get(8)));
+        //System.out.println("Mas corto: " + graph.shortestPath(ubicaciones.get(0), ubicaciones.get(8)));
 
 //        List<Lugar> ruta2 = graph.shortestPath(ubicaciones.get(0), ubicaciones.get(4));
 //        
         Thread thread = new Thread(() -> {
             while (true) {
-                List<Ruta> ruta = graph.shortestPath(ubicaciones.get((random.nextInt(9))), ubicaciones.get((random.nextInt(9))));
+                List<Ruta> ruta = graph.shortestPath(ubicaciones.get((random.nextInt(NUM_AIRPORTS))), ubicaciones.get((random.nextInt(NUM_AIRPORTS))));
                 try {
                     if (!ruta.get(0).getSalida().getAvionesEsperando().isEmpty()) {
                         Avion avionn = (Avion) ruta.get(0).getSalida().getAvionesEsperando().get(0);
@@ -119,7 +120,7 @@ public class MapApp extends Application {
                     
                 }
                 try {
-                    Thread.sleep(random.nextInt(3) *300); // Pausa de 2 segundos (2000 milisegundos)
+                    Thread.sleep(random.nextInt(3) *2300); // Pausa de 2 segundos (2000 milisegundos)
                 } catch (InterruptedException e) {
                     
                     e.printStackTrace();
@@ -138,7 +139,7 @@ public class MapApp extends Application {
     }
     
     public void drawTravelingBall(List<Ruta> rutas, Avion avionn) {
-        if (rutas.isEmpty()) {
+        if (rutas.isEmpty() || avionn==null) {
             // No hay rutas en la lista
             return;
         }
@@ -169,7 +170,7 @@ public class MapApp extends Application {
 
         // Configurar la animación
         final int framesPerSecond = 60;
-        final double duration = ruta.calcularDistancia() / avionn.getVelocidad(); // Duración de la animación en segundos
+        final double duration = ruta.calcularDistancia()*4*ruta.getPeligro() / avionn.getVelocidad(); // Duración de la animación en segundos
         final double totalFrames = framesPerSecond * duration;
         
         double currentX = startX;
@@ -178,7 +179,7 @@ public class MapApp extends Application {
         Avion avionDespachado = ruta.getSalida().despacharAvion(avionn);
         avionn.despegar(ruta.getDestino());
         
-        double gastoCombustible = avionn.getEficiencia();
+       
         AnimationTimer animationTimer = new AnimationTimer() {
             
             private double frameCount = 0;
@@ -200,17 +201,29 @@ public class MapApp extends Application {
                     System.out.println("Distancia:  " + ruta.calcularPeso() * (distancia / ((distance))));
 // Dibujar la ruta
                     
-                    avionn.consumirCombustible((int) (ruta.calcularPeso() * (distancia / ((distance)))));
+                    avionn.consumirCombustible((int) (avionn.getEficiencia()/30));
                     //drawRoute(animationGC, startX, startY, endX, endY);
                     // Dibujar la bola en la posición actual
                     animationGC.setFill(Color.BLACK);
                     animationGC.fillOval(currentPosX - 5, currentPosY - 5, 10, 10);
-                    if (avionn.consumirCombustible((int) (ruta.calcularPeso() * (distancia / ((distance))))) <= 0) {
+                    if (avionn.getEstado()==Avion.EstadoAvion.DESTRUIDO){
+                        animationGC.setFill(Color.ORANGE);
+                        stop();
+                        graph.editEdge(ubicaciones.get(0), ubicaciones.get(1), 0.5);
+                        if (animationStage.isShowing()) {
+                        animationStage.close();
+                    }
+                    }
+                    if (avionn.getCombustible() <= 0) {
                         System.out.println("Avion ha explotado");
                         animationGC.setFill(Color.ORANGE);
                         animationGC.fillOval(currentPosX - 5, currentPosY - 5, 10, 10);
-                        avionn.gestionarCombustible((int) -(ruta.calcularPeso() * (distancia / ((distance)))));
+                        avionn.gestionarCombustible((int) -(avionn.getEficiencia()));
                         stop();
+                        graph.editEdge(ubicaciones.get(0), ubicaciones.get(1), 0.5);
+                        if (animationStage.isShowing()) {
+                        animationStage.close();
+                    }
                     }
                 } else {
                     try {
@@ -228,7 +241,7 @@ public class MapApp extends Application {
                     if (animationStage.isShowing()) {
                         animationStage.close();
                     }
-                    avionn.gestionarCombustible((int) -(ruta.calcularPeso()));
+                    //avionn.gestionarCombustible((int) -(ruta.calcularPeso()));
                     // Actualizar el mapa principal con la bola en la posición final
                     //gc.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
                     //drawMap(gc);
@@ -240,6 +253,7 @@ public class MapApp extends Application {
                     System.out.println("Distancia recorrida en total:  " + ruta.calcularPeso());
                     // Llamar recursivamente al método para la siguiente ruta en la lista
                     drawTravelingBall(rutas, avionn);
+                    graph.editEdge(ubicaciones.get(0), ubicaciones.get(1), -0.5);
                 }
             }
         };
@@ -286,7 +300,7 @@ public class MapApp extends Application {
                 
                 int z = 0;
                 while (z < airport.getCapHang() - ((random.nextInt(2)) + 3)) {
-                    Avion avion = new Avion("Avion", (random.nextInt(40)) + 280, 12, 3);
+                    Avion avion = new Avion("Avion", (random.nextInt(40)) + 880, 1200, 3);
                     airport.recibirAvion(avion);
                     z++;
                 }
@@ -316,7 +330,7 @@ public class MapApp extends Application {
                 drawAirport(gc, x, y, portaAviones.getNombre());
                 int z = 0;
                 while (z < portaAviones.getCapHang() - ((random.nextInt(2)) + 3)) {
-                    Avion avionPortaAvion = new Avion("Avion", (random.nextInt(40)) + 280, 12, 3);
+                    Avion avionPortaAvion = new Avion("Avion", (random.nextInt(40)) + 880, 1200, 3);
                     portaAviones.recibirAvion(avionPortaAvion);
                     z++;
                 }
@@ -423,7 +437,22 @@ public class MapApp extends Application {
             }
             adjacencyMatrix = newMatrix;
         }
-        
+        public void editEdge(Lugar source, Lugar target, double peligro) {
+    int sourceIndex = nodes.indexOf(source);
+    int targetIndex = nodes.indexOf(target);
+
+    if (sourceIndex >= 0 && sourceIndex < nodes.size() && targetIndex >= 0 && targetIndex < nodes.size()) {
+        Ruta ruta = adjacencyMatrix[sourceIndex][targetIndex];
+        if (ruta != null) {
+            ruta.setPeligro(peligro);
+        } else {
+            // Si la ruta no existe, puedes agregarla como una nueva ruta
+            Ruta newRuta = new Ruta(source, target, peligro);
+            adjacencyMatrix[sourceIndex][targetIndex] = newRuta;
+        }
+    }
+}
+
         public void printAdjacencyMatrix() {
             int numNodes = nodes.size();
             
@@ -450,10 +479,10 @@ public class MapApp extends Application {
             return nodes.get(index);
         }
         
-        public void addEdge(Lugar source, Lugar target, int weight) {
+        public void addEdge(Lugar source, Lugar target, int peligro) {
             int sourceIndex = nodes.indexOf(source);
             int targetIndex = nodes.indexOf(target);
-            Ruta ruta = new Ruta(source, target, weight);
+            Ruta ruta = new Ruta(source, target, peligro);
             adjacencyMatrix[sourceIndex][targetIndex] = ruta;
             //adjacencyMatrix[targetIndex][sourceIndex] = ruta;
         }

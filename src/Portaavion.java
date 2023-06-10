@@ -16,21 +16,25 @@ public class Portaavion extends Lugar {
         this.capacidadHangares = capacidadHangares;
         this.avionesEsperando = new ArrayList<>();
         Random random = new Random();
-        this.combustibleDisponible = random.nextInt(20000) + 5000;
+        this.combustibleDisponible = random.nextInt(80000) + 320000;
     }
 
     @Override
     public void recibirAvion(Avion avion) {
-        if (avionesEsperando.size() < capacidadHangares) {
-            avionesEsperando.add(avion);
-            int combustiblePromedio = combustibleDisponible / capacidadHangares;
-            int rango = combustiblePromedio / 2;
-            Random random = new Random();
-            int combustibleAsignado = combustiblePromedio + random.nextInt(rango) - rango / 2;
-            avion.gestionarCombustible(combustibleAsignado);
-            System.out.println("Avión " + avion + " recibido en el porta avion " + nombre);
+        if (avion == null) {
+            return;
         } else {
-            System.out.println("Porta Avion " + nombre + " sin espacio en los hangares. No se puede recibir el avión " + avion);
+            if (avionesEsperando.size() < capacidadHangares) {
+                avionesEsperando.add(avion);
+                int combustiblePromedio = combustibleDisponible / capacidadHangares;
+                int rango = combustiblePromedio / 2;
+                Random random = new Random();
+                int combustibleAsignado = combustiblePromedio + random.nextInt(rango) - rango / 2;
+                avion.gestionarCombustible(combustibleAsignado);
+                System.out.println("Avión " + avion + " recibido en el porta avion " + nombre);
+            } else {
+                System.out.println("Porta Avion " + nombre + " sin espacio en los hangares. No se puede recibir el avión " + avion);
+            }
         }
     }
 
@@ -59,7 +63,8 @@ public class Portaavion extends Lugar {
     public double getLatitude() {
         return latitude;
     }
-@Override
+
+    @Override
     public List<Avion> getAvionesEsperando() {
         return avionesEsperando;
     }

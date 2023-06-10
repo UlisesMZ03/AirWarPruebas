@@ -16,7 +16,7 @@ public class AirPort extends Lugar {
         this.capacidadHangares = capacidadHangares;
         this.avionesEsperando = new ArrayList<>();
         Random random = new Random();
-        this.combustibleDisponible = random.nextInt(20000) + 5000;
+        this.combustibleDisponible = random.nextInt(80000) + 320000;
     }
 
     @Override

@@ -3,13 +3,13 @@ public class Avion {
 
     private String nombre;
     private int velocidad;
-    private int eficiencia;
+    private double eficiencia;
     private int fortaleza;
     private Lugar ubicacionActual;
     public EstadoAvion estado;
     private int combustible;
 
-    public Avion(String nombre, int velocidad, int eficiencia, int fortaleza) {
+    public Avion(String nombre, int velocidad, double eficiencia, int fortaleza) {
         this.nombre = nombre;
         this.velocidad = velocidad;
         this.eficiencia = eficiencia;
@@ -37,9 +37,10 @@ public class Avion {
         return velocidad;
     }
 
-    public int getEficiencia() {
+    public double getEficiencia() {
         return eficiencia;
     }
+
     public EstadoAvion getEstado() {
         return estado;
     }
@@ -53,23 +54,30 @@ public class Avion {
     }
 
     public void gestionarCombustible(int cantidad) {
-        combustible += cantidad;
-        System.out.println("Avión " + nombre + " ha recargado " + cantidad + " unidades de combustible");
-        if (combustible<=0){
+        if (combustible < 130000) {
+
+            combustible += cantidad;
+            if (combustible > 130000) {
+                System.out.println("Almacenamiento de combustible lleno");
+                combustible = 130000;
+            }
+            System.out.println("Avión " + nombre + " ha recargado " + cantidad + " unidades de combustible, combustible total: " + combustible);
+        } else {
+            System.out.println("Almacenamiento de combustible lleno");
+        }
+        if (combustible <= 0) {
             estado = EstadoAvion.DESTRUIDO;
-            System.out.println("Avión " + nombre + " ha sido destruido" );
-            
+            System.out.println("Avión " + nombre + " ha sido destruido");
+
         }
     }
 
     public int consumirCombustible(int cantidad) {
-        int combustibleTotal;
-        combustibleTotal=combustible;
-        int consumido = combustibleTotal-cantidad;
-        System.out.println("Avión " + nombre + " ha gastado " + cantidad + " unidades de combustible, combustible total: " + consumido);
-        
-        return consumido;
-        
+        combustible -= cantidad;
+        System.out.println("Avión " + nombre + "combustible total: " + combustible);
+
+        return combustible;
+
     }
 
     public void destruir(Avion avion) {
