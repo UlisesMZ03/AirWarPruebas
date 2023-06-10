@@ -22,7 +22,7 @@ public class Ruta {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         // Radio de la Tierra en kilómetros
-        double r = 1000;
+        double r = 3637.1;
 
         double distancia = r * c;
         return distancia;
