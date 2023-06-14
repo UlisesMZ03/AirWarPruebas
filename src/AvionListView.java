@@ -1,4 +1,3 @@
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -91,12 +90,12 @@ public class AvionListView extends Application {
 
         filtroDropdown = new ComboBox<>();
 
-        filtroDropdown.getItems().addAll("Eficiencia", "Velocidad");
+        filtroDropdown.getItems().addAll("Eficiencia", "Velocidad", "Fortaleza");
         filtroDropdown.setOnAction(event -> filtrarAviones(filtroDropdown.getValue()));
         HBox hboxFiltro = new HBox();
         hboxFiltro.setAlignment(Pos.CENTER_RIGHT);
 
-// Otros códigos relacionados con el ComboBox
+        // Otros códigos relacionados con el ComboBox
         hboxFiltro.getChildren().add(filtroDropdown);
 
         Button seleccionarBtn = new Button("Seleccionar");
@@ -137,6 +136,8 @@ public class AvionListView extends Application {
             comparador = Comparator.comparing(Avion::getEficiencia);
         } else if (filtro.equalsIgnoreCase("Velocidad")) {
             comparador = Comparator.comparing(Avion::getVelocidad);
+        } else if (filtro.equalsIgnoreCase("Fortaleza")) {
+            comparador = Comparator.comparing(Avion::getFortaleza);
         } else {
             // Si no se selecciona un filtro válido, no se aplica ningún filtro
             return;
@@ -156,6 +157,12 @@ public class AvionListView extends Application {
     private void ordenarPorVelocidad() {
         List<Avion> avionesList = new ArrayList<>(aviones);
         insertionSort(avionesList);
+        aviones.setAll(avionesList);
+    }
+    
+    private void ordenarPorFortaleza() {
+        List<Avion> avionesList = new ArrayList<>(aviones);
+        bubbleSort(avionesList);
         aviones.setAll(avionesList);
     }
 
@@ -221,6 +228,19 @@ public class AvionListView extends Application {
                 j = j - 1;
             }
             lista.set(j + 1, key);
+        }
+    }
+    
+    private void bubbleSort(List<Avion> lista) {
+        int n = lista.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (lista.get(j).getFortaleza() < lista.get(j + 1).getFortaleza()) {
+                    Avion temp = lista.get(j);
+                    lista.set(j, lista.get(j + 1));
+                    lista.set(j + 1, temp);
+                }
+            }
         }
     }
 }
