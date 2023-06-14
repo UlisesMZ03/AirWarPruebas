@@ -448,7 +448,7 @@ public class MapApp extends Application {
 
     public void startReceiving() {
         // Especifica el nombre del puerto y la velocidad de transmisión
-        String portName = "COM6";
+        String portName = "COM5";
         int baudRate = 9600;
 
         // Conecta con el dispositivo Arduino
